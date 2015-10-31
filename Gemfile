@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+gem 'aruba'
+gem 'gherkin'
+gem 'gherkin_lint'
+gem 'gherkin_format'
+gem 'rake'
+gem 'rubocop'
+gem 'simplecov', require: false, group: :test
+gem 'syllables'
+gem 'term-ansicolor'

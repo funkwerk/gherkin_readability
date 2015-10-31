@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require 'gherkin_readability'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = 'Usage: gherkin_readability [files]'
+  opts.on('--[no-]summary', 'Print summary') do |summary|
+    options[:summary] = summary
+  end
+end.parse!
+
+readability = GherkinReadability.new
+
+readability.analyze ARGV
+
+readability.report if options.key? :summary
