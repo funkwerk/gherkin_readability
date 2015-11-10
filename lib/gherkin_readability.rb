@@ -23,12 +23,31 @@ class GherkinReadability
       sentences = extract_sentences parse(file)
       @readability_by_file[file] = readability sentences
     end
+  end
+
+  def select_below!(threshold)
+    filtered = {}
+    @readability_by_file.each do |file, rating|
+      filtered[file] = rating if rating <= threshold
+    end
+    @readability_by_file = filtered
+  end
+
+  def select_above!(threshold)
+    filtered = {}
+    @readability_by_file.each do |file, rating|
+      filtered[file] = rating if rating >= threshold
+    end
+    @readability_by_file = filtered
+  end
+
+  def report
     @readability_by_file.sort { |lhs, rhs| lhs[1] <=> rhs[1] }.reverse_each do |file, rating|
       puts "#{rating.round}: #{file}"
     end
   end
 
-  def report
+  def summary
     average_readability = 0
     @readability_by_file.each do |_, rating|
       average_readability += rating

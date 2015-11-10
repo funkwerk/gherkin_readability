@@ -12,6 +12,7 @@ Feature: Rate
       readability = GherkinReadability.new
 
       readability.analyze %w(default.feature test.feature)
+      readability.report
 
       """
     And a file named "default.feature" with:

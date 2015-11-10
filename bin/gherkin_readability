@@ -8,10 +8,20 @@ OptionParser.new do |opts|
   opts.on('--[no-]summary', 'Print summary') do |summary|
     options[:summary] = summary
   end
+  opts.on('--below [THRESHOLD]', 'Selects just files below the threshold') do |threshold|
+    options[:below] = threshold.to_i
+  end
+  opts.on('--above [THRESHOLD]', 'Selects just files above the threshold') do |threshold|
+    options[:above] = threshold.to_i
+  end
 end.parse!
 
 readability = GherkinReadability.new
 
 readability.analyze ARGV
 
-readability.report if options.key? :summary
+readability.select_below! options[:below] if options.key? :below
+readability.select_above! options[:above] if options.key? :above
+
+readability.report
+readability.summary if options.key? :summary

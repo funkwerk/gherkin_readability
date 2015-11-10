@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'gherkin_readability'
-  s.version     = '0.0.1'
-  s.date        = '2015-10-31'
+  s.version     = '0.0.2'
+  s.date        = '2015-11-10'
   s.summary     = 'Gherkin Readability'
   s.description = 'Check readability of Gherkin Files'
   s.authors     = ['Stefan Rohe']

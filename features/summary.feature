@@ -12,7 +12,7 @@ Feature: Summary
       readability = GherkinReadability.new
 
       readability.analyze %w(default.feature test.feature)
-      readability.report
+      readability.summary
 
       """
     And a file named "default.feature" with:
