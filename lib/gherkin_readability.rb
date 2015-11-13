@@ -12,15 +12,18 @@ require 'yaml'
 require 'set'
 require 'digest'
 
-# gherkin utilities
+# gherkin readability
 class GherkinReadability
   def initialize
     @readability_by_file = {}
   end
 
-  def analyze(files)
+  def analyze(files, verbose = false)
     files.each do |file|
       sentences = extract_sentences parse(file)
+      sentences.each do |sentence|
+        puts "#{readability([sentence]).round} - #{sentence.tr("\n", ' ').strip}"
+      end if verbose
       @readability_by_file[file] = readability sentences
     end
   end

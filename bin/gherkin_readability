@@ -14,11 +14,15 @@ OptionParser.new do |opts|
   opts.on('--above [THRESHOLD]', 'Selects just files above the threshold') do |threshold|
     options[:above] = threshold.to_i
   end
+  opts.on('--verbose', 'Verbose output') do |verbose|
+    options[:verbose] = verbose
+  end
 end.parse!
 
 readability = GherkinReadability.new
 
-readability.analyze ARGV
+verbose = options.key?(:verbose) ? options[:verbose] : false
+readability.analyze(ARGV, verbose)
 
 readability.select_below! options[:below] if options.key? :below
 readability.select_above! options[:above] if options.key? :above
