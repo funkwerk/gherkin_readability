@@ -1,4 +1,6 @@
 # encoding: utf-8
+gem 'gherkin', '=2.12.2'
+
 require 'gherkin/formatter/json_formatter'
 require 'gherkin/parser/parser'
 require 'rexml/document'
@@ -64,7 +66,7 @@ class GherkinReadability
 
     total_words = 0
     total_syllabels = 0
-    Syllables.new(sentences.join '\n').to_h.each do |_word, syllabels|
+    Syllables.new(sentences.join('\n')).to_h.each do |_word, syllabels|
       total_words += 1
       total_syllabels += syllabels
     end
