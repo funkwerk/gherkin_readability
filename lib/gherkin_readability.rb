@@ -1,8 +1,7 @@
 # encoding: utf-8
-gem 'gherkin', '=2.12.2'
+gem 'gherkin', '=3.2.0'
 
-require 'gherkin/formatter/json_formatter'
-require 'gherkin/parser/parser'
+require 'gherkin/parser'
 require 'rexml/document'
 require 'stringio'
 require 'multi_json'
@@ -75,43 +74,26 @@ class GherkinReadability
 
   def parse(file)
     content = File.read file
-    to_json(content, file)
+    Gherkin::Parser.new.parse content
   end
 
-  def extract_sentences(parsed)
-    feature_names = lambda do |input|
-      input.map { |feature| feature['name'] unless feature['name'] == '' }
-    end
+  def extract_sentences(input)
+    sentences = []
 
-    descriptions = lambda do |input|
-      input.map { |feature| feature['description'] unless feature['description'] == '' }
-    end
-
-    sentences = feature_names.call(parsed) + descriptions.call(parsed) + scenario_names(parsed) + sentences(parsed)
-    sentences.select! { |sentence| sentence }
+    sentences.push input[:name] unless input[:name].empty?
+    sentences.push input[:description] if input.key? :description
+    sentences.push input[:background][:name] if input.key?(:background) && !input[:background][:name].empty?
+    sentences += scenario_names input
+    sentences += sentences input
     sentences.map { |sentence| sentence.gsub(/ «.+»/, '') }
   end
 
-  def to_json(input, file = 'generated.feature')
-    io = StringIO.new
-    formatter = Gherkin::Formatter::JSONFormatter.new(io)
-    parser = Gherkin::Parser::Parser.new(formatter, true)
-    parser.parse(input, file, 0)
-    formatter.done
-    MultiJson.load io.string
-  end
-
   def scenario_names(input)
-    # TODO: scenario outlines with example values inside?
     scenarios = []
-    input.each do |features|
-      next unless features.key? 'elements'
-      elements = features['elements']
-      elements.each do |scenario|
-        scenarios.push scenario['name'] if scenario['type'] == 'scenario'
-        scenarios.push scenario['name'] if scenario['type'] == 'scenario_outline'
-        scenarios.push scenario['description'] unless scenario['description'].empty?
-      end
+
+    input[:scenarioDefinitions].each do |scenario|
+      scenarios.push scenario[:name]
+      scenarios.push scenario[:description] if scenario.key? :description
     end
     scenarios
   end
@@ -119,23 +101,21 @@ class GherkinReadability
   def sentences(input)
     sentences = []
     background = []
-    input.each do |features|
-      next unless features.key? 'elements'
-      features['elements'].each do |scenario|
-        next unless scenario.key? 'steps'
-        terms = background.dup
-        if scenario['type'] == 'background'
-          background.push extract_terms_from_scenario(scenario['steps'], terms)
-          next
-        end
 
-        terms.push extract_terms_from_scenario(scenario['steps'], background)
-        sentence = terms.join(' ').strip
-        if scenario.key? 'examples'
-          sentences += extract_examples(scenario['examples'], sentence)
-        else
-          sentences.push sentence
-        end
+    if input.key?(:background) && input[:background].key?(:steps)
+      background = extract_terms_from_scenario(input[:background][:steps], [])
+    end
+
+    input[:scenarioDefinitions].each do |scenario|
+      next unless scenario.key? :steps
+      terms = background.dup
+
+      terms.push extract_terms_from_scenario(scenario[:steps], background)
+      sentence = terms.join(' ').strip
+      if scenario.key? :examples
+        sentences += extract_examples(scenario[:examples], sentence)
+      else
+        sentences.push sentence
       end
     end
     sentences
@@ -143,20 +123,19 @@ class GherkinReadability
 
   def extract_terms_from_scenario(steps, background)
     steps.map do |step|
-      keyword = step['keyword']
+      keyword = step[:keyword]
       keyword = 'and ' unless background.empty? || keyword != 'Given '
-      terms = [keyword, step['name']].join
+      terms = [keyword, step[:text]].join
       terms = uncapitalize(terms) unless background.empty?
       background = terms
-      terms
     end.flatten
   end
 
   def extract_examples(examples, prototype)
     examples.map do |example|
       sentences = []
-      sentences.push example['name'] unless example['name'].empty?
-      sentences.push example['description'] unless example['description'].empty?
+      sentences.push example[:name] unless example[:name].empty?
+      sentences.push example[:description] if example.key? :description
       sentences += expand_outlines(prototype, example)
       sentences
     end.flatten
@@ -168,10 +147,12 @@ class GherkinReadability
 
   def expand_outlines(sentence, example)
     result = []
-    headers = example['rows'][0]['cells']
-    example['rows'].slice(1, example['rows'].length).each do |row|
+    headers = example[:tableHeader][:cells].map { |cell| cell[:value] }
+
+    example[:tableBody].each do |row|
       modified_sentence = sentence.dup
-      headers.zip(row['cells']).map { |key, value| modified_sentence.gsub!("<#{key}>", value) }
+      values = row[:cells].map { |cell| cell[:value] }
+      headers.zip(values).map { |key, value| modified_sentence.gsub!("<#{key}>", value) }
       result.push modified_sentence
     end
     result
