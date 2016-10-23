@@ -31,5 +31,5 @@ task :lint do
 end
 
 task :format do
-  sh 'gherkin_format features/*.feature'
+  # TODO: sh 'gherkin_format features/*.feature'
 end
