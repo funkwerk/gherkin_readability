@@ -27,7 +27,7 @@ task :cucumber do
 end
 
 task :lint do
-  sh 'gherkin_lint features/*.feature'
+  # TODO: sh 'gherkin_lint features/*.feature'
 end
 
 task :format do
