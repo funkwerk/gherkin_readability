@@ -4,4 +4,7 @@ MAINTAINER think@hotmail.de
 RUN \
   gem install gherkin_readability --no-format-exec
 
-CMD gherkin_readability
+ENV LC_ALL=C.UTF-8
+
+ENTRYPOINT ["gherkin_readability"]
+CMD ["--help"]
