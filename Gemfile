@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 gem 'aruba'
 gem 'gherkin', '=3.2.0'
+gem 'multi_json'
 # TODO: gem 'gherkin_lint'
 # TODO: gem 'gherkin_format'
 gem 'rake'

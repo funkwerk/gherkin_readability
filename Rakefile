@@ -12,7 +12,7 @@ task test: :cucumber
 
 desc 'Publishes the Gem'
 task push: :build do
-  sh 'gem push gherkin_readability-0.1.0.gem'
+  sh 'gem push gherkin_readability-0.2.0.gem'
 end
 
 desc 'Checks ruby style'

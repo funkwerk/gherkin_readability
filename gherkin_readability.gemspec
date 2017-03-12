@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'gherkin_readability'
-  s.version     = '0.1.0'
-  s.date        = '2016-02-28'
+  s.version     = '0.2.0'
+  s.date        = '2017-03-12'
   s.summary     = 'Gherkin Readability'
   s.description = 'Determine readability of Gherkin Files'
   s.authors     = ['Stefan Rohe']
@@ -12,5 +12,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'gherkin', ['= 3.2.0']
   s.add_runtime_dependency 'term-ansicolor', ['>= 1.3.2']
   s.add_runtime_dependency 'syllables', ['>= 0.1.4']
+  s.add_runtime_dependency 'multi_json', ['>=1.12.1']
   s.add_development_dependency 'aruba', ['>= 0.6.2']
 end
