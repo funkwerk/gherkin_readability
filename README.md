@@ -20,3 +20,11 @@ Assuming there are feature files in the current directory. Then call.
 `docker run -ti -v $(pwd):/src -w /src gherkin/readability *.feature`
 
 This will mount the current directory within the Gherkin Readability Docker Container and then check all feature files.
+
+## Installation
+
+Install it with:
+
+`sudo gem install gherkin_readability`
+
+After that `gherkin_readability` executable is available.
